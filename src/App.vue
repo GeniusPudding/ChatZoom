@@ -1,14 +1,21 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+      <article class='main'>
+        <czHeader></czHeader>
+        <router-view></router-view>
+      </article>
   </div>
 </template>
+<script>
+import czHeader from './components/czHeader.vue'
+export default {
+  components:{
+    czHeader
+  }
+}
+</script>
 
-<style>
+<style> 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
