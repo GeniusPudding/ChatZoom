@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.2",
     "firebase": "^8.6.8",
+    "firebase-admin": "^9.9.0",
     "firebaseui": "^4.8.0",
     "vue": "^2.6.11",
     "vue-cookies": "^1.7.4",

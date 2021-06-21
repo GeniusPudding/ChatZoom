@@ -68,16 +68,16 @@ export default {
       if (this.$route.name == "Personal") {
         this.ownQuery.get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            // console.log(doc.id, " => ", doc.data());
+            console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            // console.log("rooms:", rooms);
+            console.log("rooms:", rooms);
           });
         });
         this.memQuery.get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            // console.log("rooms:", rooms);
+            console.log("rooms:", rooms);
           });
         });
       } else {
@@ -101,7 +101,7 @@ export default {
         return "public-row";
       }
     },
-    async enterRoom(index) {
+    enterRoom(index) {
       console.log("enter:", this.roomData[index].owner, index);
       this.curRoom = this.roomData[index];
       console.log("this.curRoom:", this.curRoom);
@@ -109,26 +109,19 @@ export default {
       console.log("addUser:",this.$route.name);
       if (this.$route.name == 'Search') {
         console.log("addUser");
-        await this.addUser()
+        this.addUser()
       }
-      
-      
+    
       this.inChat = true;
       this.$router.push("chatroom");
     },
     addUser() {
-      console.log('this.curRoom.room_id:',this.curRoom.room_id,'this.username:',this.username)//PMdb8fzHDbNW5XDFWlaC
-      var washingtonRef = db.collection("rooms").doc("PMdb8fzHDbNW5XDFWlaC");
-      washingtonRef.update({
+      console.log('this.curRoom.room_id:',this.curRoom.room_id,'this.username:',this.username)
+      var roomRef = db.collection("rooms").doc(this.curRoom.room_id);
+      roomRef.update({
           members: firebase.firestore.FieldValue.arrayUnion(this.username)
       })
-
-
-      
-      // const res = await db.collection("rooms").doc('PMdb8fzHDbNW5XDFWlaC').update({
-      //   members: firebase.firestore.FieldValue.arrayUnion(this.username)  
-      // })
-      console.log("addUser res:", washingtonRef);
+      console.log("addUser res:", roomRef);
     },
   },
 };
