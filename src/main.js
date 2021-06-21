@@ -37,8 +37,10 @@ router.beforeEach((to, from, next) => {
     next('login')
     return
   }
-  if(to.name!='Chatroom'){
-    console.log('from:',from.name)
+  if(to.name == 'Chatroom'){
+    if(from.name != 'Search' && from.name != 'Personal'){
+      return 
+    }
   }
 
   next()
@@ -67,7 +69,7 @@ new Vue({
       } else {
         Vue.$cookies.remove("chatzoom");
         console.log('auth to login')
-        Vue.$router.push('/login')
+        this.$router.push('/login')
       }
      });
   },
