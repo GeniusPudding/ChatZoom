@@ -13,9 +13,12 @@ Vue.use(VueCookies)
 Vue.use(ElementUI);
 Vue.use(firestorePlugin)
 Vue.use(DatePicker)
+
 Vue.config.productionTip = false
 
-
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 router.beforeEach((to, from, next) => {
   console.log("router.to:", to.name)
@@ -41,32 +44,32 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+
+
 new Vue({
   store,
   router,
-  created() {
-    firebase.initializeApp(firebaseConfig)
-    console.log('firebase.auth():',firebase.auth())
+  created(){
     firebase.auth().onAuthStateChanged((user) => {
       console.log('auth user:',user)
       if(user) {
         console.log('auth to personal')
         
-        this.$cookies.set("chatzoom", {
+        Vue.$cookies.set("chatzoom", {
           uid: user.uid,
           isLogin: true,
           token: user.refreshToken,
           username: user.displayName,
           email: user.email
         })
-        console.log('this.$cookies:',this.$cookies)
-        this.$router.push('/personal')
+        console.log('this.$cookies:',Vue.$cookies)
+        // Vue.$router.push('/personal')
       } else {
-        this.$cookies.remove("chatzoom");
+        Vue.$cookies.remove("chatzoom");
         console.log('auth to login')
-        this.$router.push('/login')
+        Vue.$router.push('/login')
       }
      });
-    },
+  },
   render: h => h(App)
 }).$mount('#app')
