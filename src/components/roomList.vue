@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="roomData" style="width: 72%" :row-class-name="tableRowClassName">
+  <el-table :data="roomData" :row-class-name="tableRowClassName">
     <el-table-column prop="msgs" label="">
       <template slot-scope="scope">
         <el-button type="warning" @click="enterRoom(scope.$index)">{{ text }}</el-button>
@@ -12,8 +12,9 @@
 </template>
 <script>
 // import roomItem from './buttons/roomItem.vue'
+import firebase from 'firebase'
 import { db } from "../firebase/db";
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 import { mapFields } from "vuex-map-fields";
 export default {
   data() {
@@ -30,12 +31,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(["username"]),
-    ...mapFields(["roomData", "curRoom", "inChat"]),
+    // ...mapState([""]),
+    ...mapFields(["roomData", "curRoom", "inChat", "username"]),
   },
   async mounted() {
     console.log("mounted roomData:", this.roomData);
     console.log("this.$route.name:", this.$route.name);
+    console.log("this.username:", this.username);
+    if (!this.username) {
+      this.username = this.$cookies.get("chatzoom").username;
+    }
     this.ownQuery = db.collection("rooms").where("owner", "==", this.username);
     this.memQuery = db.collection("rooms").where("members", "array-contains", this.username);
     this.pubQuery = db.collection("rooms").where("prop", "==", "public");
@@ -63,24 +68,26 @@ export default {
       if (this.$route.name == "Personal") {
         this.ownQuery.get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
+            // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            console.log("rooms:", rooms);
+            // console.log("rooms:", rooms);
           });
         });
         this.memQuery.get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
+            // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            console.log("rooms:", rooms);
+            // console.log("rooms:", rooms);
           });
         });
       } else {
         this.pubQuery.get().then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
-            rooms.push({ ...doc.data(), room_id: doc.id });
-            console.log("rooms:", rooms);
+            // console.log(doc.id, " => ", doc.data());
+            if(doc.data().owner!=this.username){
+              rooms.push({ ...doc.data(), room_id: doc.id });
+            }
+            // console.log("rooms:", rooms);
           });
         });
       }
@@ -94,15 +101,34 @@ export default {
         return "public-row";
       }
     },
-    enterRoom(index) {
+    async enterRoom(index) {
       console.log("enter:", this.roomData[index].owner, index);
-      if (this.roomData[index].owner == "GG") {
-        console.log("GG!");
-      }
       this.curRoom = this.roomData[index];
       console.log("this.curRoom:", this.curRoom);
+      console.log("enter this.username:", this.username);
+      console.log("addUser:",this.$route.name);
+      if (this.$route.name == 'Search') {
+        console.log("addUser");
+        await this.addUser()
+      }
+      
+      
       this.inChat = true;
       this.$router.push("chatroom");
+    },
+    addUser() {
+      console.log('this.curRoom.room_id:',this.curRoom.room_id,'this.username:',this.username)//PMdb8fzHDbNW5XDFWlaC
+      var washingtonRef = db.collection("rooms").doc("PMdb8fzHDbNW5XDFWlaC");
+      washingtonRef.update({
+          members: firebase.firestore.FieldValue.arrayUnion(this.username)
+      })
+
+
+      
+      // const res = await db.collection("rooms").doc('PMdb8fzHDbNW5XDFWlaC').update({
+      //   members: firebase.firestore.FieldValue.arrayUnion(this.username)  
+      // })
+      console.log("addUser res:", washingtonRef);
     },
   },
 };

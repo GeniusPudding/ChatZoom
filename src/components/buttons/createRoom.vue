@@ -43,7 +43,7 @@ export default {
     ...mapState(["username", "characters"]),
     roomInfo() {
       return {
-        msg: [],
+        msgs: [],
         groupname: this.form.groupname,
         prop: this.form.prop,
         owner: this.username,

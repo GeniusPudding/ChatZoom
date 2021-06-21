@@ -19,11 +19,10 @@
         </el-menu-item>
         <el-submenu  v-if="inChat"  index="3">
           <template slot="title">
-            <i class="el-icon-location"></i>
+            <i class="el-icon-user"></i>
             <span>成員列表</span>
           </template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
+          <el-menu-item  v-for="(item, $index) in memberList" :key="$index">{{item}}</el-menu-item>
 
         </el-submenu>
 
@@ -36,11 +35,13 @@ import { mapState } from "vuex";
 export default {
   data() {
     return {
-      
     };
   },
   computed: {
     ...mapState(["inChat", "curRoom"]),
+    memberList(){
+      return this.curRoom.members.concat(this.curRoom.owner)
+    }
   },
   mounted() {
     console.log('test inChat:',this.inChat)

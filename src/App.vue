@@ -3,7 +3,7 @@
       <article class='main'>
         <czHeader></czHeader>
         <navMenu></navMenu>
-        <router-view></router-view>
+        <router-view  style="position:absolute; right:0px; width: 72%" ></router-view>
       </article>
   </div>
 </template>
