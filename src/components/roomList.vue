@@ -1,9 +1,5 @@
 <template>
-  <el-table
-    :data="roomData"
-    style="width: 72%"
-    :row-class-name="tableRowClassName"
-  >
+  <el-table :data="roomData" style="width: 72%" :row-class-name="tableRowClassName">
     <el-table-column prop="msgs" label="">
       <template slot-scope="scope">
         <el-button type="warning" @click="enterRoom(scope.$index)">Enter</el-button>
@@ -17,42 +13,58 @@
 <script>
 // import roomItem from './buttons/roomItem.vue'
 import { db } from "../firebase/db";
+import { mapState } from "vuex";
+import { mapFields } from "vuex-map-fields"
 export default {
   data() {
     return {
-      roomData: [],
+      ownRooms: [],
+      pubRooms: [],
+      // roomData: [],
+      mode: "", // personal or search
+      routeName:'',
+      firestore: Object
     };
   },
-  firestore: {
-    //load info of rooms from db
-    roomData: db.collection("rooms"),
+  computed: {
+    ...mapState(["username"]),
+    ...mapFields(["roomData"])
   },
-  watch: {
-    "this.roomData": function () {
-      console.log("roomData:", this.roomData);
-    },
+  firestore(){
+    // console.log('firestore:',this.$cookies.get("chatzoom").username)
+    let username = this.$cookies.get("chatzoom").username
+    return{
+      //load info of rooms from db
+      ownRooms: db.collection("rooms").where("owner", "==", username),
+      pubRooms: db.collection("rooms").where("prop", "==", 'public')
+    }
+
   },
+
   mounted() {
-    console.log("roomData:", this.roomData);
+    console.log("mounted roomData:", this.roomData);
+    console.log("this.$route.name:", this.$route.name);
+    this.roomData = this.$route.name == 'Personal' ? this.ownRooms : this.pubRooms
+
   },
-  computed: {},
+
   components: {
     // roomItem
   },
   methods: {
     tableRowClassName(bundle) {
-      if (bundle.row.prop === 'private') {
+      if (bundle.row.prop === "private") {
         return "private-row";
       } else {
         return "public-row";
       }
     },
     enterRoom(index) {
-      console.log("enter:", this.roomData[index].owner,index)
-      if(this.roomData[index].owner=='GG'){
-          console.log('GG!')
+      console.log("enter:", this.roomData[index].owner, index);
+      if (this.roomData[index].owner == "GG") {
+        console.log("GG!");
       }
-      this.$router.push('')
+      this.$router.push("chatroom");
     },
   },
 };

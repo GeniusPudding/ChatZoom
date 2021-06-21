@@ -1,11 +1,15 @@
 <template>
   <div>
-      ser
+      <roomList></roomList>
   </div>
 </template>
 <script>
+import roomList from "../components/roomList.vue";
 export default {
-
+  components: {
+    
+    roomList,
+  },
 }
 </script>
 

@@ -2,14 +2,17 @@
   <div id="app">
       <article class='main'>
         <czHeader></czHeader>
+        <navMenu></navMenu>
         <router-view></router-view>
       </article>
   </div>
 </template>
 <script>
+import navMenu from "./components/navMenu.vue";
 import czHeader from './components/czHeader.vue'
 export default {
   components:{
+    navMenu,
     czHeader
   }
 }
