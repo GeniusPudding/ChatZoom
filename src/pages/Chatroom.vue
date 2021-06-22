@@ -1,5 +1,8 @@
 <template>
   <div class="block">
+    <el-header
+      ><b>{{ groupname }}</b></el-header
+    >
     <el-input
       type="textarea"
       :rows="2"
@@ -58,7 +61,7 @@
                 text-shadow: black 0.1em 0.1em 0.1em;
               "
             >
-              from <b>{{ msgItem.From }}</b>
+              from <b>{{ getMsgFromOwn(msgItem.From) }}</b>
             </p>
             <p
               style="
@@ -72,19 +75,8 @@
           </div>
         </el-card>
       </el-timeline-item>
-      <!-- <el-timeline-item timestamp="2018/4/3" placement="top">
-      <el-card>
-        <h4>更新 Github 模板</h4>
-        <p>王小虎 提交于 2018/4/3 20:46</p>
-      </el-card>
-    </el-timeline-item>
-    <el-timeline-item timestamp="2018/4/2" placement="top">
-      <el-card>
-        <h4>更新 Github 模板</h4>
-        <p>王小虎 提交于 2018/4/2 20:46</p>
-      </el-card>
-    </el-timeline-item> -->
     </el-timeline>
+    <el-backtop target=".block"></el-backtop>
   </div>
 </template>
 <script>
@@ -96,10 +88,11 @@ export default {
   data() {
     return {
       textarea: "",
+      msgObserver: Object,
     };
   },
   computed: {
-    ...mapState(["inChat",  "username"]),
+    ...mapState(["username"]),
     ...mapFields(["curRoom"]),
     msgList() {
       console.log("this.curRoom.msgs:", this.curRoom.msgs);
@@ -108,6 +101,23 @@ export default {
     orderMsgList() {
       return this.getOrderedMsgs(this.msgList);
     },
+    groupname(){
+      return this.curRoom.groupname
+    },
+    roomRef(){
+      return db.collection("rooms").doc(this.curRoom.room_id);
+    },
+
+  },
+  mounted(){
+    this.msgObserver = this.roomRef.onSnapshot(doc => {
+    console.log(`Received doc snapshot: ${doc}`);
+    console.log('Received doc data:',doc.data());
+    this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
+    // ...
+  }, err => {
+    console.log(`Encountered error: ${err}`);
+    })
   },
   methods: {
     onSubmit(event) {
@@ -125,7 +135,6 @@ export default {
       console.log("textarea:", this.textarea);
     },
     getFromYou(from) {
-      console.log('get from:',from)
       if (from == this.username) {
         return true;
       } else {
@@ -155,21 +164,27 @@ export default {
 
       return orderMsgs;
     },
+    getMsgFromOwn(from){
+      if(this.curRoom.owner == from){
+        return from+" (管理員)"
+      }
+      return from
+    },
+
     async addMsg(msgObj) {
       console.log("add msgObj,msgObj.From:", msgObj);
       console.log("add msgObj.From:", msgObj.From);
-      var roomRef = db.collection("rooms").doc(this.curRoom.room_id);
       let msgPackStr =
         msgObj.Msg + "~!~#~%~&~" + msgObj.From + "~!~#~%~&~" + msgObj.Time;
-      await roomRef.update({
+      await this.roomRef.update({
         msgs: firebase.firestore.FieldValue.arrayUnion(msgPackStr),
       });
-      roomRef
+      this.roomRef
         .get()
         .then((doc) => {
           if (doc.exists) {
             console.log("Document data:", doc.data());
-            this.curRoom = doc.data() 
+            this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
           } else {
             // doc.data() will be undefined in this case
             console.log("No such document!");

@@ -1,21 +1,25 @@
 <template>
   <div>
-      <el-button type="warning"  @click='logOut'>登出</el-button>
+    <el-button type="warning" @click="logOut">登出</el-button>
   </div>
 </template>
 <script>
-
-import firebase from 'firebase'
+import firebase from "firebase";
+import { mapFields } from "vuex-map-fields";
 export default {
-methods: { 
-  logOut() { 
+  methods: {
+    computed: {
+      ...mapFields(["isLogin","inchat"]),
+    },
+    logOut() {
+      this.isLogin = false;
+      this.inchat = false
+      firebase.auth().signOut();
       
-    firebase.auth().signOut();
-  } 
-},
-}
+    },
+  },
+};
 </script>
 
 <style>
-
 </style>

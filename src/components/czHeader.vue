@@ -1,6 +1,8 @@
 <template>
-  <header class="header">
-    [header TBD] Hi <div v-if="username">{{username}}</div>
+  <header class="header" style="background-color:#E8AAE1">
+    [header TBD] Hi! 
+    <div v-if="$route.name !== 'Login'">{{username}}</div>
+    <div v-else>Please login first!</div>
     <logout v-if="$route.name !== 'Login'"></logout>
   </header>
 </template>

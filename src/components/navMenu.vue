@@ -20,32 +20,54 @@
         <el-submenu  v-if="inChat"  index="3">
           <template slot="title">
             <i class="el-icon-user"></i>
-            <span>成員列表</span>
+            <span>聊天室成員</span>
           </template>
           <el-menu-item  v-for="(item, $index) in memberList" :key="$index">{{item}}</el-menu-item>
-
         </el-submenu>
-
+        <el-submenu  v-if="isOwn"  index="3">
+          <template slot="title">
+            <i class="el-icon-user-solid"></i>
+            <span>點選加入其它用戶</span>
+          </template>
+          <el-menu-item @click="addOtherUser(item)"  v-for="(item, $index) in othersList" :key="$index">{{item}}</el-menu-item>
+        </el-submenu>
       </el-menu>
     </el-col>
   </div>
 </template>
 <script>
+import firebase from "firebase";
+import { db } from "../firebase/db";
 import { mapState } from "vuex";
+import { mapFields } from "vuex-map-fields";
 export default {
   data() {
     return {
     };
   },
   computed: {
-    ...mapState(["inChat", "curRoom"]),
+    ...mapState(["allusers","username","isLogin"]),
+    ...mapFields(["curRoom","inChat"]),
+    roomRef(){
+      return db.collection("rooms").doc(this.curRoom.room_id);
+    },
     memberList(){
       return this.curRoom.members.concat(this.curRoom.owner)
-    }
+    },
+    othersList(){
+      return this.allusers.filter(user=>!this.memberList.includes(user))
+    },
+    isOwn(){
+      return this.inChat && this.curRoom.owner == this.username && this.isLogin
+    },
+
   },
   mounted() {
-    console.log('test inChat:',this.inChat)
+    console.log('NAV this.$route.name:',this.$route.name)
     console.log('test curRoom:',this.curRoom)
+    if(this.$route.name=='Login'){
+      this.inChat = false
+    }
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -58,6 +80,14 @@ export default {
         console.log("test");
       }
     },
+    async addOtherUser(name){
+      await this.roomRef.update({
+        members: firebase.firestore.FieldValue.arrayUnion(name),
+      });
+      let doc = await this.roomRef.get();
+      console.log("doc.data():", doc.data());
+      this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id };
+    }
   },
 };
 </script>

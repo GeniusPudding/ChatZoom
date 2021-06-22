@@ -2,7 +2,9 @@
   <el-table :data="roomData" :row-class-name="tableRowClassName">
     <el-table-column prop="msgs" label="">
       <template slot-scope="scope">
-        <el-button type="warning" @click="enterRoom(scope.$index)">{{ text }}</el-button>
+        <el-button type="warning" @click="enterRoom(scope.$index)">{{
+          text
+        }}</el-button>
       </template>
     </el-table-column>
     <el-table-column prop="owner" label="房主"> </el-table-column>
@@ -12,20 +14,14 @@
 </template>
 <script>
 // import roomItem from './buttons/roomItem.vue'
-import firebase from 'firebase'
+import firebase from "firebase";
 import { db } from "../firebase/db";
 // import { mapState } from "vuex";
 import { mapFields } from "vuex-map-fields";
 export default {
   data() {
     return {
-      ownQuery: Object,
-      memQuery: Object,
-      pubQuery: Object,
       // roomData: [],
-      mode: "", // personal or search
-      routeName: "",
-      firestore: Object,
       isLoaded: false,
       text: "",
     };
@@ -33,6 +29,20 @@ export default {
   computed: {
     // ...mapState([""]),
     ...mapFields(["roomData", "curRoom", "inChat", "username"]),
+    roomRef() {
+      return db.collection("rooms").doc(this.curRoom.room_id);
+    },
+    ownRef() {
+      return db.collection("rooms").where("owner", "==", this.username);
+    },
+    memRef() {
+      return db
+        .collection("rooms")
+        .where("members", "array-contains", this.username);
+    },
+    pubRef() {
+      return db.collection("rooms").where("prop", "==", "public");
+    },
   },
   async mounted() {
     console.log("mounted roomData:", this.roomData);
@@ -41,50 +51,36 @@ export default {
     if (!this.username) {
       this.username = this.$cookies.get("chatzoom").username;
     }
-    this.ownQuery = db.collection("rooms").where("owner", "==", this.username);
-    this.memQuery = db.collection("rooms").where("members", "array-contains", this.username);
-    this.pubQuery = db.collection("rooms").where("prop", "==", "public");
     this.roomData = await this.getRooms();
     this.inChat = false;
     this.text = this.$route.name == "Personal" ? "Enter!" : "Join!";
 
     console.log("this.roomData:", this.roomData);
-
-  },
-  // watch:{
-  //   "this.roomData": ()=>{
-  //     if(!this.isLoaded && this.roomData){
-  //       this.isLoaded = true
-  //     }
-
-  //   }
-  // },
-  components: {
-    // roomItem
+    //TODO: add Badge
   },
   methods: {
     async getRooms() {
       const rooms = [];
       if (this.$route.name == "Personal") {
-        this.ownQuery.get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
+        this.ownRef.get().then((queryRooms) => {
+          queryRooms.forEach((doc) => {
             console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
             console.log("rooms:", rooms);
           });
         });
-        this.memQuery.get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
+        this.memRef.get().then((queryRooms) => {
+          queryRooms.forEach((doc) => {
             // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
             console.log("rooms:", rooms);
           });
         });
       } else {
-        this.pubQuery.get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
+        this.pubRef.get().then((queryRooms) => {
+          queryRooms.forEach((doc) => {
             // console.log(doc.id, " => ", doc.data());
-            if(doc.data().owner!=this.username){
+            if (doc.data().owner != this.username && !(doc.data().members.includes(this.username)) ) {
               rooms.push({ ...doc.data(), room_id: doc.id });
             }
             // console.log("rooms:", rooms);
@@ -106,22 +102,22 @@ export default {
       this.curRoom = this.roomData[index];
       console.log("this.curRoom:", this.curRoom);
       console.log("enter this.username:", this.username);
-      console.log("addUser:",this.$route.name);
-      if (this.$route.name == 'Search') {
+      console.log("addUser:", this.$route.name);
+      if (this.$route.name == "Search") {
         console.log("addUser");
-        this.addUser()
+        this.addUser();
       }
-    
+
       this.inChat = true;
       this.$router.push("chatroom");
     },
-    addUser() {
-      console.log('this.curRoom.room_id:',this.curRoom.room_id,'this.username:',this.username)
-      var roomRef = db.collection("rooms").doc(this.curRoom.room_id);
-      roomRef.update({
-          members: firebase.firestore.FieldValue.arrayUnion(this.username)
-      })
-      console.log("addUser res:", roomRef);
+    async addUser() {
+      await this.roomRef.update({
+        members: firebase.firestore.FieldValue.arrayUnion(this.username),
+      });
+      let doc = await this.roomRef.get();
+      console.log("doc.data():", doc.data());
+      this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
     },
   },
 };
