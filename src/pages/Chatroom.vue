@@ -4,14 +4,18 @@
       ><b>{{ groupname }}</b></el-header
     >
     <el-input
+    ref="input" 
+    style="width: 60%"
       type="textarea"
       :rows="2"
       placeholder=""
       v-model="textarea"
       @keyup.enter.native="onSubmit"
+      
     >
     </el-input>
-    <el-button
+    <el-button 
+      style="display: inline-block"
       @click.native="onSubmit"
       type="primary"
       icon="el-icon-s-promotion"
@@ -101,28 +105,31 @@ export default {
     orderMsgList() {
       return this.getOrderedMsgs(this.msgList);
     },
-    groupname(){
-      return this.curRoom.groupname
+    groupname() {
+      return this.curRoom.groupname;
     },
-    roomRef(){
+    roomRef() {
       return db.collection("rooms").doc(this.curRoom.room_id);
     },
-
   },
-  mounted(){
-    this.msgObserver = this.roomRef.onSnapshot(doc => {
-    console.log(`Received doc snapshot: ${doc}`);
-    console.log('Received doc data:',doc.data());
-    this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
-    // ...
-  }, err => {
-    console.log(`Encountered error: ${err}`);
-    })
+  mounted() {
+    this.$refs.input.focus();
+    this.msgObserver = this.roomRef.onSnapshot(
+      (doc) => {
+        // console.log(`Received doc snapshot: ${doc}`);
+        // console.log("Received doc data:", doc.data());
+        this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id };
+        // ...
+      },
+      (err) => {
+        console.log(`Encountered error: ${err}`);
+      }
+    );
   },
   methods: {
     onSubmit(event) {
-      console.log("event:", event);
-      console.log("event.shiftKey:", event.shiftKey);
+      // console.log("event:", event);
+      // console.log("event.shiftKey:", event.shiftKey);
       if (!event.shiftKey) {
         let msgObj = {
           Msg: this.textarea,
@@ -157,23 +164,23 @@ export default {
         orderMsgs = orderMsgs.sort((x, y) => {
           return Date.parse(y.Time) - Date.parse(x.Time);
         });
-        console.log("order msgs:", orderMsgs);
+        // console.log("order msgs:", orderMsgs);
       } catch (error) {
         console.error(error);
       }
 
       return orderMsgs;
     },
-    getMsgFromOwn(from){
-      if(this.curRoom.owner == from){
-        return from+" (管理員)"
+    getMsgFromOwn(from) {
+      if (this.curRoom.owner == from) {
+        return from + " (管理員)";
       }
-      return from
+      return from;
     },
 
     async addMsg(msgObj) {
-      console.log("add msgObj,msgObj.From:", msgObj);
-      console.log("add msgObj.From:", msgObj.From);
+      // console.log("add msgObj,msgObj.From:", msgObj);
+      // console.log("add msgObj.From:", msgObj.From);
       let msgPackStr =
         msgObj.Msg + "~!~#~%~&~" + msgObj.From + "~!~#~%~&~" + msgObj.Time;
       await this.roomRef.update({
@@ -183,11 +190,11 @@ export default {
         .get()
         .then((doc) => {
           if (doc.exists) {
-            console.log("Document data:", doc.data());
-            this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
+            // console.log("Document data:", doc.data());
+            this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id };
           } else {
             // doc.data() will be undefined in this case
-            console.log("No such document!");
+            // console.log("No such document!");
           }
         })
         .catch((error) => {

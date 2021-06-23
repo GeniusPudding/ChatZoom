@@ -3,7 +3,7 @@
     <el-col :span="9" style="width: 27%">
       <el-menu
         @select="handleSelect"
-        default-active="2"
+        default-active="1"
         class="el-menu-vertical-demo"
         background-color="#545c64"
         text-color="#fff"
@@ -17,6 +17,16 @@
           <i class="el-icon-search"></i>
           <span slot="title">搜尋聊天室</span>
         </el-menu-item>
+      </el-menu>  
+      <el-menu
+        @select="handleSelect"
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="#543c64"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+      >
+
         <el-submenu  v-if="inChat"  index="3">
           <template slot="title">
             <i class="el-icon-user"></i>
@@ -63,15 +73,15 @@ export default {
 
   },
   mounted() {
-    console.log('NAV this.$route.name:',this.$route.name)
-    console.log('test curRoom:',this.curRoom)
+    // console.log('NAV this.$route.name:',this.$route.name)
+    // console.log('test curRoom:',this.curRoom)
     if(this.$route.name=='Login'){
       this.inChat = false
     }
   },
   methods: {
     handleSelect(key, keyPath) {
-      console.log(key, keyPath);
+      console.log( keyPath);
       if (key == 1) {
         this.$router.push("/personal");
       } else if (key == 2) {

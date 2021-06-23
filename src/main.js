@@ -36,6 +36,9 @@ router.beforeEach((to, from, next) => {
     console.log("Redirect to login")
     next('login')
     return
+  }else if (cookie.isLogin && to.name=='Login'){
+    next('personal')
+    return
   }
   if(to.name == 'Chatroom'){
     if(from.name != 'Search' && from.name != 'Personal'){

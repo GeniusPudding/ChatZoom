@@ -28,7 +28,7 @@ export default {
         names: firebase.firestore.FieldValue.arrayUnion(this.username),
     });
     let doc = await this.userRef.get();
-    console.log("mounted doc.data():", doc.data());
+    // console.log("mounted doc.data():", doc.data());
     this.allusers = doc.data().names
   },
   components: {

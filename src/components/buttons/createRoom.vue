@@ -44,6 +44,7 @@ export default {
     roomInfo() {
       return {
         msgs: [],
+        members: [],
         groupname: this.form.groupname,
         prop: this.form.prop,
         owner: this.username,
@@ -54,8 +55,10 @@ export default {
     async create() {
       this.dialogFormVisible = false;
       let ran_id = this.generateString(19)
-      const res = await db.collection("rooms").doc(ran_id).set(this.roomInfo);
-      console.log("res:", res);
+      let ranRef = db.collection("rooms").doc(ran_id)
+      await ranRef.set(this.roomInfo);
+      // ranRef
+      
     },
 
     generateString(length) {

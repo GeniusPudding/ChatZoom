@@ -1,10 +1,17 @@
 <template>
-  <el-table :data="roomData" :row-class-name="tableRowClassName">
+  <el-table
+    style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)"
+    :data="roomData"
+    :row-class-name="tableRowClassName"
+  >
     <el-table-column prop="msgs" label="">
       <template slot-scope="scope">
-        <el-button type="warning" @click="enterRoom(scope.$index)">{{
-          text
-        }}</el-button>
+        <el-button
+          style="box-shadow: 2px 2px 12px 2px rgba(0, 0, 0, 0.1)"
+          type="warning"
+          @click="enterRoom(scope.$index)"
+          >{{ text }}</el-button
+        >
       </template>
     </el-table-column>
     <el-table-column prop="owner" label="房主"> </el-table-column>
@@ -45,17 +52,36 @@ export default {
     },
   },
   async mounted() {
-    console.log("mounted roomData:", this.roomData);
-    console.log("this.$route.name:", this.$route.name);
-    console.log("this.username:", this.username);
+    // console.log("mounted roomData:", this.roomData);
+    // console.log("this.$route.name:", this.$route.name);
+    // console.log("this.username:", this.username);
     if (!this.username) {
       this.username = this.$cookies.get("chatzoom").username;
     }
     this.roomData = await this.getRooms();
     this.inChat = false;
     this.text = this.$route.name == "Personal" ? "Enter!" : "Join!";
-
-    console.log("this.roomData:", this.roomData);
+    // console.log("this.roomData:", this.roomData);
+    if (this.$route.name == "Personal") {
+      this.msgObserver = this.ownRef.onSnapshot(
+        (doc) => {
+          doc.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              let room = change.doc.data();
+              // console.log(" room: ", room);
+              if (!this.roomData.some((r) => r.groupname == room.groupname)) {
+                // console.log("New room: ", room);
+                this.roomData.push(room);
+              }
+              // this.roomData.push(change.doc.data())
+            }
+          });
+        },
+        (err) => {
+          console.log(`Encountered error: ${err}`);
+        }
+      );
+    }
     //TODO: add Badge
   },
   methods: {
@@ -64,23 +90,26 @@ export default {
       if (this.$route.name == "Personal") {
         this.ownRef.get().then((queryRooms) => {
           queryRooms.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data());
+            // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            console.log("rooms:", rooms);
+            // console.log("rooms:", rooms);
           });
         });
         this.memRef.get().then((queryRooms) => {
           queryRooms.forEach((doc) => {
             // console.log(doc.id, " => ", doc.data());
             rooms.push({ ...doc.data(), room_id: doc.id });
-            console.log("rooms:", rooms);
+            // console.log("rooms:", rooms);
           });
         });
       } else {
         this.pubRef.get().then((queryRooms) => {
           queryRooms.forEach((doc) => {
             // console.log(doc.id, " => ", doc.data());
-            if (doc.data().owner != this.username && !(doc.data().members.includes(this.username)) ) {
+            if (
+              doc.data().owner != this.username &&
+              !doc.data().members.includes(this.username)
+            ) {
               rooms.push({ ...doc.data(), room_id: doc.id });
             }
             // console.log("rooms:", rooms);
@@ -98,11 +127,11 @@ export default {
       }
     },
     enterRoom(index) {
-      console.log("enter:", this.roomData[index].owner, index);
+      // console.log("enter:", this.roomData[index].owner, index);
       this.curRoom = this.roomData[index];
-      console.log("this.curRoom:", this.curRoom);
-      console.log("enter this.username:", this.username);
-      console.log("addUser:", this.$route.name);
+      // console.log("this.curRoom:", this.curRoom);
+      // console.log("enter this.username:", this.username);
+      // console.log("addUser:", this.$route.name);
       if (this.$route.name == "Search") {
         console.log("addUser");
         this.addUser();
@@ -116,8 +145,8 @@ export default {
         members: firebase.firestore.FieldValue.arrayUnion(this.username),
       });
       let doc = await this.roomRef.get();
-      console.log("doc.data():", doc.data());
-      this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id }
+      // console.log("add yourself doc.data():", doc.data());
+      this.curRoom = { ...doc.data(), room_id: this.curRoom.room_id };
     },
   },
 };

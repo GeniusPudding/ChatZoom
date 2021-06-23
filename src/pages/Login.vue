@@ -12,10 +12,10 @@ import "firebaseui/dist/firebaseui.css";
 export default {
   name: "Login",
   mounted() {
-    console.log("firebase:", firebase);
-    console.log("firebaseui:", firebaseui);
+    // console.log("firebase:", firebase);
+    // console.log("firebaseui:", firebaseui);
     var uiConfig = {
-      signInSuccessUrl: "/personal",
+      signInSuccessUrl: "/",
       signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
     };
 
@@ -23,7 +23,7 @@ export default {
     if (!ui) {
       ui = new firebaseui.auth.AuthUI(firebase.auth());
     }
-    console.log("ui:", ui);
+    // console.log("ui:", ui);
     ui.start("#firebaseui-auth-container", uiConfig);
   },
 };
