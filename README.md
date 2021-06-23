@@ -1,4 +1,5 @@
 # chatzoom
+Quite simple real-time web chat app based-on firestore+Vue2
 
 ## Project setup
 ```
