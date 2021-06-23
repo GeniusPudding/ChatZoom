@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-col :span="9" style="width: 27%">
+  <div >
+    <el-col class="w3-large w3-theme-l5 w3-animate-left navbg" :span="9" style="width: 27% ">
       <el-menu
         @select="handleSelect"
         default-active="1"
@@ -19,6 +19,7 @@
         </el-menu-item>
       </el-menu>  
       <el-menu
+        style="margin: 1vh;"
         @select="handleSelect"
         default-active="2"
         class="el-menu-vertical-demo"
@@ -101,3 +102,11 @@ export default {
   },
 };
 </script>
+<style>
+.navbg{
+  height: 100vh;
+  background-color: rgb(8, 49, 49);
+  background-image: url('../assets/images/nav.jpg');
+  background-size:cover;
+}
+</style>

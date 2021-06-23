@@ -1,12 +1,14 @@
 <template>
-  <header class="header" style="background-color:#E8AAE1;height: 15 vh;box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)" >
-    <b style="font-style:oblique;display: inline-block">
-      Hi! 
-      
-    </b> 
-    <div v-if="$route.name !== 'Login'">{{username}}</div>
-    <div v-else>Please login first!</div>
-    <logout style="" v-if="$route.name !== 'Login'"></logout>
+  <header
+    class="w3-bar w3-theme-d2 w3-left-align w3-large w3-animate-top"
+  >
+    <h1 class="w3-bar-item w3-hide-medium  w3-padding-large w3-hover-white w3-large w3-theme-d2">
+      <b > Hi! </b>
+      <i class="el-icon-s-opportunity"></i>
+      <div  v-if="$route.name !== 'Login'">{{ username }}</div>
+      <div  v-else>Please login first!</div>
+    </h1>
+    <logout  class="w3-bar-item  w3-right w3-button w3-padding-large" v-if="$route.name !== 'Login'"></logout>
   </header>
 </template>
 <script>
@@ -22,4 +24,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

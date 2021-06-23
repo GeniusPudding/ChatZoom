@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="bg">
       <roomList></roomList>
   </div>
 </template>
@@ -23,5 +23,10 @@ export default {
 </script>
 
 <style>
-
+.bg{
+  background-color: aliceblue;
+  height: 100vh;
+  background-size:cover;
+  background-image: url('../assets/images/bg.jpg'), linear-gradient(to top, #0250c5 0%, #d43f8d 100%);
+}
 </style>

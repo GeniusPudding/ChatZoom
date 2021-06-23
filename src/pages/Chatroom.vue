@@ -1,14 +1,14 @@
 <template>
-  <div class="block">
-    <el-header
+  <div class="block bg">
+    <el-header class="groupname"
       ><b>{{ groupname }}</b></el-header
     >
     <el-input
     ref="input" 
-    style="width: 60%"
+    style="width: 66%"
       type="textarea"
-      :rows="2"
-      placeholder=""
+      :rows="4"
+      placeholder="想說些什麼呢"
       v-model="textarea"
       @keyup.enter.native="onSubmit"
       
@@ -24,12 +24,15 @@
 
     <el-timeline>
       <el-timeline-item
+        
         v-for="(msgItem, $index) in orderMsgList"
         :key="$index"
+        :icon="last($index)"
+        :type= "primary"
         placement="top"
       >
-        <el-card v-if="getFromYou(msgItem.From)" align="right">
-          <strong style="font-family: monospace; font-size: 4vh">{{
+        <el-card style="height:15vh;width:30vw;left:30vw;position:relative" v-if="getFromYou(msgItem.From)" align="right">
+          <strong style="font-family: monospace; font-size: 2vh">{{
             msgItem.Msg
           }}</strong>
           <div>
@@ -53,8 +56,8 @@
             </p>
           </div>
         </el-card>
-        <el-card v-else align="left">
-          <strong style="font-family: monospace; font-size: 4vh">{{
+        <el-card  style="height:15vh;width:30vw;left:0vw;position:relative" v-else align="left">
+          <strong style="font-family: monospace; font-size: 2vh">{{
             msgItem.Msg
           }}</strong>
           <div>
@@ -201,9 +204,26 @@ export default {
           console.log("Error getting document:", error);
         });
     },
+    last(index){
+      if(index==0){
+        return 'el-icon-more'
+      }
+    }
   },
 };
 </script>
 
 <style>
+.bg{
+  background-color: aliceblue;
+  background-size:cover;
+  background-image: url('../assets/images/bg.jpg'), linear-gradient(to top, #0250c5 0%, #d43f8d 100%);
+}
+.groupname{
+  color: black;
+  font-size: 4vh;
+  text-shadow: black 0.1em 0.1em 0.2em;
+  background-color: #aabcd6;
+  
+}
 </style>

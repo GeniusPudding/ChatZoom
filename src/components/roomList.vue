@@ -4,7 +4,7 @@
     :data="roomData"
     :row-class-name="tableRowClassName"
   >
-    <el-table-column prop="msgs" label="">
+    <el-table-column class="column" prop="msgs" label="">
       <template slot-scope="scope">
         <el-button
           style="box-shadow: 2px 2px 12px 2px rgba(0, 0, 0, 0.1)"
@@ -14,9 +14,9 @@
         >
       </template>
     </el-table-column>
-    <el-table-column prop="owner" label="房主"> </el-table-column>
-    <el-table-column prop="groupname" label="群組名稱"> </el-table-column>
-    <el-table-column prop="prop" label="類型" width="100"> </el-table-column>
+    <el-table-column class="column"  prop="owner" label="房主"> </el-table-column>
+    <el-table-column class="column"  prop="groupname" label="群組名稱"> </el-table-column>
+    <el-table-column class="column"  prop="prop" label="類型" width="100"> </el-table-column>
   </el-table>
 </template>
 <script>
@@ -159,5 +159,9 @@ export default {
 
 .el-table .public-row {
   background: #f0f9eb;
+}
+.column{
+  width: 10vw;
+  font:bolder
 }
 </style>
